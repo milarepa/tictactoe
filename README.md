@@ -1,5 +1,5 @@
-##TicTacToe that cant be beat
-===============================
+##TicTacToe That Can't Be Beat i.e MiniMax With AB Pruning
+==========================================================
 
 Implementation of miniMax. Of all the algorithms I studied this last month
 and reviewed, this one missed me. I tell you, I get it now...

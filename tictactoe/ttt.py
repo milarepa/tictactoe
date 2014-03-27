@@ -1,74 +1,146 @@
-# This is a Zero Sum game - two experts will always tie...
-import ai
+"""
+classification
+"""
+class GF:
+  'Game field class'
 
-def print_promt():
-  print "Here is the playing field, starting at the left top as 1 and so on"
-  print_field([2,3,4,5,6,7,8,9,10])
-  users = build_users()
-  
+  def __init__(self):
 
-def print_field(field):
+    self.prev_moves = []
+    self.board = [ '-' for i in range(0,9) ]
+    self.winner = None
+    self.marker = ''
+    self.opponentmark = ''
 
-  # create the playing field
-  # key of this presentation is
-  # i * 3 * j I would love to explore
-  # i * x * j where x is larger !!
-  print "Current PLaying Field. \n"
+  def __str__(self):
+    return 'Game Field Object'
 
-  for i in range(3):
-    print " ",
-    for j in range(3):
-      if field[i*3+j] == 1:
-        print 'X',
-      elif field[i*3+j] == 0:
-        print 'O',
-      elif field[i*3+j] != -1:
-        print field[i*3+j]-1,
+
+  def humanMove(self):
+    'manages human moves'
+
+    flag = True
+    while flag:
+
+      choice = raw_input("please enter your postition choice : ")
+      try:
+        mvs = int(choice)
+      except:
+        mvs = -1
+
+      if mvs not in self.gatherMoves():
+        print "Move not available"
       else:
-        print ' ',
+        break
 
-      if j != 2:
-        print " | ",
-    print
+    self.markBoard(self.marker, mvs)
 
-    if i != 2:
-      print "----------------"
+
+  def printBoard(self):
+    'printBoard() : prints the current board'
+
+    for j in range(0,9,3):
+      for i in range(3):
+        if self.board[j+i] == '-':
+          print "%d |" %(j+i),
+        else:
+          print "%s |" %self.board[j+i],
+      print "\n",
+
+
+  def gatherMoves(self):
+    'gather the empty moves'
+    moves = []
+
+    for i,v in enumerate(self.board):
+      if v == '-':
+        moves.append(i)
+
+    return moves
+
+
+  def markBoard(self,marker,pos):
+    '''Mark a position with marker X or O'''
+
+    self.board[pos] = marker
+    self.prev_moves.append(pos)
+
+
+  def endGame(self):
+    'For each turn we need to check if the game has win condiditons'
+
+    win_conditions = [
+      (0,1,2),
+      (3,4,5),
+      (6,7,8),
+      (0,3,6),
+      (1,4,7),
+      (2,5,8),
+      (0,4,8),
+      (2,4,6),
+      ]
+
+    # unpack sets and compare sets with board to see if win cond has been met
+    if ('x','X','X') in win_conditions and self.marker == 'X':
+      self.winner = 'X'
+      return True
+        
+    if('O','O','O') in win_conditions:
+      self.winner = 'O'
+      return True
+
+    return False
+
+
+
+class Ai:
+  'AI takes on turns based on MiniMax choices'
+
+  def __init__(self, marker):
+    self.marker = marker
+
+    if self.marker == 'X':
+      self.opponentmark = 'O'
+    elif self.marker == 'O':
+      self.opponentmark = 'X'
     else:
-      print
+      self.message = "init failed to set marks\n"
+
+  def __str__(self):
+    return self.marker
 
 
-def build_users():
+  def score(self,GFinstance):
 
-  flag = False
-
-  while not flag:
-    try:
-      user_xo = raw_input("Are You X or O ?\n")
-      print "User choice : " + user_xo + "\n"
-
-      if user_xo == "X":
-        users_hash = {0: "human", 1: "machine"}
-        current_user = users_hash[0]
-        flag = True
-      elif user_xo == "O":
-        users_hash = {0: "human", 1: "machine"}
-        current_user = users_hash[1]
-        flag = True
+    if GFinstance.endGame():
+      if GFinstance.winner  == self.marker:
+        return 10
+      elif GFinstance.winner == self.opponentmark:
+        return -10
       else:
-        print "I am sorry, that is not a choice. Try again...\n"
-        print_promt()
-    except Exception as e:
-      print "I am sorry, that is not a choice (e). Try again...\n"
-      print_promt()
+        return 0
+
+  def move(GFinstance):
+    'minimax implementation'
+    if GFinstance.endGame():
+      return Ai.score(GFinstance)
+      
+    scores = []
+    moves = []
     
-    return user_hash
-      
-      
-def take_turn(user):
-  sqr = raw_input("Where would you like to place your tile ?\n")
-  field = [2,3,4,5,6,7,8,9,10]
-  if sqr in field:
-    return print_field([2,3,4,5,6,7,8,9,10])
+    for move in GFinstance.gatherMoves():
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

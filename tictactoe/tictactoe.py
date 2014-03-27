@@ -1,182 +1,96 @@
-"""
-classification
-"""
-class GF:
-  'Game field class'
+import ttt as t
+import random as r
+
+class GStruct:
+  'Wrap class for running other game objects'
+
 
   def __init__(self):
-
-    self.prev_moves = []
-    self.board = [ '-' for i in range(0,9) ]
-    self.winner = None
-    self.marker = ''
+    self.game = t.GF()
+    self.human = 0
+    self.comp = 0
+    self.winner = ''
+    self.message = 'default'
+    self.current_user = ''
 
   def __str__(self):
-    return 'Game Field Object'
+    return "Construct for a game collection"
 
-  def humanMove(self):
-    'manages human moves'
+  def play(self):
+    'play loop'
+    
+    f = True
+    while f:
 
-    flag = True
-    while flag:
+      h = raw_input("\nAre you X or O ?\n")
 
-      choice = raw_input("please enter your postition choice : ")
-      try:
-        mvs = int(choice)
-      except:
-        mvs = -1
-
-      if mvs not in self.gatherMoves():
-        print "Move not available"
+      if h == 'X':
+        self.ai = t.Ai('O')
+        self.ai.opponentmark = 'X'
+        self.game.marker = 'X'
+        self.game.opponentmark = 'O'
+        first = self.flipCoin()
+        f = False
+      elif h == 'O':
+        self.ai = t.Ai('X')
+        self.ai.opponentmark = 'O'
+        self.game.opponentmark = 'X'
+        self.game.marker = 'O'
+        first = self.flipCoin()
+        f = False
       else:
+        print "\nThat is an invald answer. Try again - X or O :  "
+
+    if first == 'human':
+      self.human = 2
+      self.comp = 1
+    else:
+      self.human = 1
+      self.comp = 2
+
+    for i in range(9):
+
+      self.game.printBoard()
+
+      if i % 2 == 0:
+        self.current_user = 2
+        print "\nLooks like its my move, I choose : \n"
+        self.ai.moveMe(self.game)
+      else:
+        self.current_user = 1
+        print "\nLooks like its your move.\n"
+        self.game.humanMove()
+
+      if self.game.endGame() and self.game.winner != '-':
+        print self.game.winner + " is the winner!!"
         break
 
-    self.markBoard(self.marker, mvs)
-
-  def printBoard(self):
-    'printBoard() : prints the current board'
-
-    for j in range(0,9,3):
-      for i in range(3):
-        if self.board[j+i] == '-':
-          print "%d |" %(j+i),
-        else:
-          print "%s |" %self.board[j+i],
-      print "\n",
-
-  def gatherMoves(self):
-    'gather the empty moves'
-    moves = []
-
-    for i,v in enumerate(self.board):
-      if v == '-':
-        moves.append(i)
-
-    return moves
 
 
-  def markBoard(self,marker,pos):
-    '''Mark a position with marker X or O'''
+  def flipCoin(self):
+    'flip to see who goes first'
 
-    self.board[pos] = marker
-    self.prev_moves.append(pos)
+    n = r.randint(0,1)
 
-
-  def backOut(self):
-    'for minMax desicions we need to able to back out of a move or moves'
-
-    self.board[self.prev_moves.pop()] = '-'
-    self.winner = None
-
-  def endGame(self):
-    'For each turn we need to check if the game has win condiditons'
-
-    win_conditions = [
-      (0,1,2),
-      (3,4,5),
-      (6,7,8),
-      (0,3,6),
-      (1,4,7),
-      (2,5,8),
-      (0,4,8),
-      (2,4,6),
-      ]
-
-    # unpack sets and compare sets with board to see if win cond has been met
-    if ('x','X','X') in win_conditions:
-      if('O','O','O') in win_conditions:
-        return True
-
-    return False
-
-
-
-class Ai:
-  'AI takes on turns based on MiniMax choices'
-
-  def __init__(self, marker):
-    self.marker = marker
-
-    if self.marker == 'X':
-      self.opponentmark = 'O'
-    elif self.marker == 'O':
-      self.opponentmark = 'X'
+    if str(self.ai) == 'O':
+      f = {0: "comp", 1: "Human"}
     else:
-      self.message = "init failed to set marks\n"
+      f = {0: "human",1: "comp"}
+      
+    self.current_user = f[n]
 
-  def __str__(self):
-    return self.marker
-
-  def moveMe(self,GFinstance):
-    return maxMove(self,GFinstance)
+    return f[n]
 
 
-  def maxMove(self,GFinstance):
-    'max move'
-
-    if GFinstance.endGame():
-      return GFinstance.winner
-
-    bm = []
-
-    for mvs in GFinstance.gatherMoves():
-      GFinstance.markBoard(self.marker,mvs)
-
-      if GFinstance.endGame():
-        score = self.aqcScore(GFinstance)
-      else:
-        move_position,score = self.minMove(GFinstance)
-
-      GFinstance.backOut()
-
-      if bs == None or score > bs:
-        bs = score
-        bm = mvs
-
-    return bm, bs
-
-  def minMove(self, GFinstance):
-    'min move'
-
-    best_move = []
-
-    for mvs in GFinstance.gatherMoves():
-
-      GFinstance.markBoard(self.marker,mvs)
-
-      if GFinstance.endGame():
-        score = self.aqcScore(GFinstance)
-      else:
-        move_position,score = self.maxMove(GFinstance)
-
-      GFinstance.backOut()
-
-      if bs == None or score < bs:
-        bs = score
-        bm = mvs
-
-    return bm, bs
-
-  def aqcScore(self,GFinstance):
-
-    if GFinstance.endGame():
-      if GFinstance.winner  == self.marker:
-        return 10
-      elif GFinstance.winner == self.opponentmark:
-        return -10
-
-    return 0
+def main():
+  'Running the program - main()'
+  s = GStruct()
+  s.play()
 
 
 
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+  main()
 
 
 
