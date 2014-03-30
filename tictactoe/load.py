@@ -1,24 +1,29 @@
-"""
-board = [ '-' for i in range(0,9) ]
+#!/usr/bin/python3
+from nose.tools import *
+import ttt as t
 
-print "\nCurrent board:"
 
-for j in range(0,9,3):
-  for i in range(3):
-    if board[j+i] == '-':
-      print "%d |" %(j+i),
-    else:
-      print "%s |" %board[j+i],
-  print "\n",
-"""
+OPERATOR = t.GF()
+AGENT = t.Ai('X')
 
-def loopy():
-  'returns a list of somethings'
-  x = [2 % i for i in range(1,9)]
-  return x
+
+def op_tests():
+  OPERATOR.printBoard()
+  
+  OPERATOR.markBoard('X', 4)
+  
+  print OPERATOR.board
+  
+  OPERATOR.printBoard()
+  
+  b = OPERATOR.endGame(AGENT.marker)
+  print str(b)
   
   
-for m in loopy():
-  print m,
+def main():
+  op_tests()
+  
+if __name__ == '__main__':
+  main()
     
 

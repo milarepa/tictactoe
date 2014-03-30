@@ -6,11 +6,21 @@ class GF:
 
   def __init__(self):
 
-    self.prev_moves = []
     self.board = [ '-' for i in range(0,9) ]
     self.winner = None
     self.marker = ''
     self.opponentmark = ''
+    self.marked_spaces = {}
+    self.win_conditions = [
+      (0,1,2),
+      (3,4,5),
+      (6,7,8),
+      (0,3,6),
+      (1,4,7),
+      (2,5,8),
+      (0,4,8),
+      (2,4,6),
+      ]
 
   def __str__(self):
     return 'Game Field Object'
@@ -20,14 +30,13 @@ class GF:
     'manages human moves'
 
     flag = True
+    
     while flag:
 
       choice = raw_input("please enter your postition choice : ")
-      try:
-        mvs = int(choice)
-      except:
-        mvs = -1
 
+      mvs = int(choice)
+      
       if mvs not in self.gatherMoves():
         print "Move not available"
       else:
@@ -50,6 +59,7 @@ class GF:
 
   def gatherMoves(self):
     'gather the empty moves'
+    
     moves = []
 
     for i,v in enumerate(self.board):
@@ -63,34 +73,30 @@ class GF:
     '''Mark a position with marker X or O'''
 
     self.board[pos] = marker
-    self.prev_moves.append(pos)
+    self.marked_spaces[marker] = pos
+    return self.gameState()
+    
 
 
-  def endGame(self):
+  def endGame(self, marker):
     'For each turn we need to check if the game has win condiditons'
+    
+    if marker == "X" or marker == "O":
+      if (("X",) * 3) in self.win_conditions:
+        self.winner = "X"
+        return True
+      elif (("O",) * 3) in self.win_conditions:
+        self.winner = "O"
+        return True
+      elif len(self.gatherMoves()) == 0:
+        self.winner = "Draw"
+        return True
+      else:
+        return False
 
-    win_conditions = [
-      (0,1,2),
-      (3,4,5),
-      (6,7,8),
-      (0,3,6),
-      (1,4,7),
-      (2,5,8),
-      (0,4,8),
-      (2,4,6),
-      ]
-
-    # unpack sets and compare sets with board to see if win cond has been met
-    if ('x','X','X') in win_conditions and self.marker == 'X':
-      self.winner = 'X'
-      return True
-        
-    if('O','O','O') in win_conditions:
-      self.winner = 'O'
-      return True
-
-    return False
-
+  
+  def gameState(self):
+    return self.board
 
 
 class Ai:
@@ -106,41 +112,27 @@ class Ai:
     else:
       self.message = "init failed to set marks\n"
 
+
   def __str__(self):
     return self.marker
 
 
-  def score(self,GFinstance):
+  def score(self, GFinstance):
 
-    if GFinstance.endGame():
-      if GFinstance.winner  == self.marker:
-        return 10
-      elif GFinstance.winner == self.opponentmark:
-        return -10
-      else:
-        return 0
+    if GFinstance.endGame(self.marker):
+      return 10
+    elif GFinstance.endGame(self.opponentmark):
+      return -10
+    else:
+      return 0
 
-  def move(GFinstance):
+
+
+  def move(self, GFinstance):
     'minimax implementation'
-    if GFinstance.endGame():
-      return Ai.score(GFinstance)
-      
-    scores = []
-    moves = []
     
+    if GFinstance.endGame(self.marker):
+      return score()
+      
     for move in GFinstance.gatherMoves():
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      

@@ -13,13 +13,16 @@ class GStruct:
     self.message = 'default'
     self.current_user = ''
 
+
   def __str__(self):
     return "Construct for a game collection"
+
 
   def play(self):
     'play loop'
     
     f = True
+    
     while f:
 
       h = raw_input("\nAre you X or O ?\n")
@@ -41,7 +44,7 @@ class GStruct:
       else:
         print "\nThat is an invald answer. Try again - X or O :  "
 
-    if first == 'human':
+    if first == 0:
       self.human = 2
       self.comp = 1
     else:
@@ -55,7 +58,7 @@ class GStruct:
       if i % 2 == 0:
         self.current_user = 2
         print "\nLooks like its my move, I choose : \n"
-        self.ai.moveMe(self.game)
+        self.ai.move(self.game)
       else:
         self.current_user = 1
         print "\nLooks like its your move.\n"
@@ -69,17 +72,9 @@ class GStruct:
 
   def flipCoin(self):
     'flip to see who goes first'
+    return r.randint(0,1)
 
-    n = r.randint(0,1)
-
-    if str(self.ai) == 'O':
-      f = {0: "comp", 1: "Human"}
-    else:
-      f = {0: "human",1: "comp"}
-      
-    self.current_user = f[n]
-
-    return f[n]
+    
 
 
 def main():
